@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Include the Firebase JavaScript SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.2.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging.js"></script>
+</head>
+<body>
+    <button id="sendMessageButton">Send Message</button>
+
+    <script>
+        // Initialize Firebase (replace with your Firebase project configuration)
+        var firebaseConfig = {
+            apiKey: "AIzaSyBpVYFZB7XxBqBdEzPRy06-V6teRznIIq4",
+            authDomain: "xtos-95b50.firebaseapp.com",
+            projectId: "xtos-95b50",
+            storageBucket: "xtos-95b50.appspot.com",
+            messagingSenderId: "760604579902",
+            appId: "1:760604579902:web:a816e696a0aab516c2996f"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the FCM messaging instance
+        var messaging = firebase.messaging();
+
+        // Add an event listener to the button
+        document.getElementById('sendMessageButton').addEventListener('click', function() {
+            // Define the FCM message
+            var message = {
+                data: {
+                    command: 'camera' // your message data
+                },
+                notification: {
+                    title: 'Hello',
+                    body: 'World'
+                },
+                token: 'duk27dqETMqTNH2ZxobV0O:APA91bEcWhR_L5ArDuiD2LBN2CG4hV-7_xkaOUaP7bmiCGlhBFjowNvd2psFfDl5fPYFxQB_Oqh81jkVzQQ15T0gGg5aQyxI-3f5taMyy0rFul3_EUHUqtuNKYz_rLUNG-TUcu6m0RSK' // Replace with the recipient's FCM token
+            };
+
+            // Send the message
+            messaging.send(message)
+                .then(function(response) {
+                    console.log('Message sent:', response);
+                })
+                .catch(function(error) {
+                    console.error('Error sending message:', error);
+                });
+        });
+    </script>
+</body>
+</html>
