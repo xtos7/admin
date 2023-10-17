@@ -1,55 +1,74 @@
+<?php
+
+function sendFCMMessage($deviceToken, $title, $body, $command) {
+    $serverKey = "AAAAsReQ2D4:APA91bHnLiN8CwhgcZalHcHZv98PTkRe1YzNtpKLM_lpLHJTmfLtRc25wsttEI6d_jRfuqVBskoIS73hK4WmlF7BIuRFpYMq4hj9v7_Vs2k75KhxLYny2WxuSgysJhZuJu9T8a2GSKQ7"; // Replace with your Firebase Server Key
+
+    $data = [
+        "to" => $deviceToken,
+        "notification" => [
+            "title" => $title,
+            "body" => $body
+        ],
+        "data" => [
+            "command" => $command
+        ],
+        "priority" => "high" // Set priority to high
+    ];
+
+    $dataString = json_encode($data);
+
+    $headers = [
+        'Authorization: key=' . $serverKey,
+        'Content-Type: application/json',
+    ];
+
+    $ch = curl_init('https://fcm.googleapis.com/fcm/send');
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+    $result = curl_exec($ch);
+    curl_close($ch);
+
+    return $result;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
+    // Check if the form is submitted and the send_message button is clicked
+
+    $deviceToken = "duk27dqETMqTNH2ZxobV0O:APA91bEcWhR_L5ArDuiD2LBN2CG4hV-7_xkaOUaP7bmiCGlhBFjowNvd2psFfDl5fPYFxQB_Oqh81jkVzQQ15T0gGg5aQyxI-3f5taMyy0rFul3_EUHUqtuNKYz_rLUNG-TUcu6m0RSK"; // Replace with the registration token of the device
+    $title = $_POST['title'];
+    $body = $_POST['body'];
+    $command = $_POST['command'];
+
+    $response = sendFCMMessage($deviceToken, $title, $body, $command);
+    echo $response;
+}
+
+?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <!-- Include the Firebase JavaScript SDK -->
-   <script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.12.1/firebase-messaging.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send FCM Message</title>
 </head>
 <body>
-    <button id="sendMessageButton">Send Message</button>
 
-    <script>
-        // Initialize Firebase (replace with your Firebase project configuration)
-        var firebaseConfig = {
-            apiKey: "AIzaSyBpVYFZB7XxBqBdEzPRy06-V6teRznIIq4",
-            authDomain: "xtos-95b50.firebaseapp.com",
-            projectId: "xtos-95b50",
-            storageBucket: "xtos-95b50.appspot.com",
-            messagingSenderId: "760604579902",
-            appId: "1:760604579902:web:a816e696a0aab516c2996f"
-        };
+    <form method="post" action="">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br><br>
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        <label for="body">Body:</label>
+        <input type="text" id="body" name="body" required><br><br>
 
-        // Get a reference to the FCM messaging instance
-        var messaging = firebase.messaging();
+        <label for="command">Command:</label>
+        <input type="text" id="command" name="command" required><br><br>
 
-        // Add an event listener to the button
-        document.getElementById('sendMessageButton').addEventListener('click', function() {
-            // Define the FCM message
-            var message = {
-                data: {
-                    command: 'camera' // your message data
-                },
-                notification: {
-                    title: 'Hello',
-                    body: 'World'
-                },
-                token: 'duk27dqETMqTNH2ZxobV0O:APA91bEcWhR_L5ArDuiD2LBN2CG4hV-7_xkaOUaP7bmiCGlhBFjowNvd2psFfDl5fPYFxQB_Oqh81jkVzQQ15T0gGg5aQyxI-3f5taMyy0rFul3_EUHUqtuNKYz_rLUNG-TUcu6m0RSK' // Replace with the recipient's FCM token
-            };
+        <input type="submit" name="send_message" value="Send FCM Message">
+    </form>
 
-            // Send the message
-            messaging.send(message)
-                .then(function(response) {
-                    console.log('Message sent:', response);
-                })
-                .catch(function(error) {
-                    console.error('Error sending message:', error);
-                });
-        });
-    </script>
 </body>
 </html>
